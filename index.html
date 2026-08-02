@@ -330,17 +330,22 @@
 
   const navBar = document.getElementById('navBar');
   let navHideTimer = null;
-  window.addEventListener('scroll', () => {
-    navBar.style.opacity = '1';
-    navBar.style.transform = 'translateY(0)';
-    navBar.style.pointerEvents = 'auto';
+  function scheduleNavHide() {
     clearTimeout(navHideTimer);
     navHideTimer = setTimeout(() => {
+      if (window.scrollY <= 0) { scheduleNavHide(); return; }
       navBar.style.opacity = '0';
       navBar.style.transform = 'translateY(-8px)';
       navBar.style.pointerEvents = 'none';
     }, 3000);
+  }
+  window.addEventListener('scroll', () => {
+    navBar.style.opacity = '1';
+    navBar.style.transform = 'translateY(0)';
+    navBar.style.pointerEvents = 'auto';
+    scheduleNavHide();
   }, { passive: true });
+  scheduleNavHide();
 </script>
 </body>
 </html>
