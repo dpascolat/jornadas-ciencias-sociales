@@ -325,7 +325,7 @@
   📝 Inscribirme
 </a>
 
-<button id="backToTop" onclick="animateScrollTo(0,700)" aria-label="Volver arriba" style="position:fixed;bottom:20px;left:20px;z-index:60;background:#2A1A2E;color:#fff;border:none;width:52px;height:52px;border-radius:999px;box-shadow:0 4px 14px rgba(0,0,0,0.25);display:flex;align-items:center;justify-content:center;cursor:pointer;">
+<button id="backToTop" onclick="animateScrollTo(0,700)" aria-label="Volver arriba" style="position:fixed;bottom:20px;left:20px;z-index:60;background:#2A1A2E;color:#fff;border:none;width:52px;height:52px;border-radius:999px;box-shadow:0 4px 14px rgba(0,0,0,0.25);display:flex;align-items:center;justify-content:center;cursor:pointer;opacity:0;transform:scale(0.6) translateY(10px);pointer-events:none;transition:opacity 0.3s ease,transform 0.3s ease;">
   <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="19" x2="12" y2="5"/><polyline points="5 12 12 5 19 12"/></svg>
 </button>
 
@@ -357,6 +357,21 @@
       document.getElementById('navLinks').classList.remove('open');
     });
   });
+
+  const backToTopBtn = document.getElementById('backToTop');
+  function updateBackToTop() {
+    if (window.scrollY > 300) {
+      backToTopBtn.style.opacity = '1';
+      backToTopBtn.style.transform = 'scale(1) translateY(0)';
+      backToTopBtn.style.pointerEvents = 'auto';
+    } else {
+      backToTopBtn.style.opacity = '0';
+      backToTopBtn.style.transform = 'scale(0.6) translateY(10px)';
+      backToTopBtn.style.pointerEvents = 'none';
+    }
+  }
+  window.addEventListener('scroll', updateBackToTop, { passive: true });
+  updateBackToTop();
 
   const shareText ='III Jornadas Regionales de Enseñanza de las Ciencias Sociales - 24 y 25 de septiembre, IFDC San Antonio Oeste.';
   const whatsappHref = 'https://wa.me/?text=' + encodeURIComponent(shareText + ' ' + window.location.href);
