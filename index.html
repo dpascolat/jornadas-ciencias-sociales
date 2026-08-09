@@ -20,6 +20,8 @@
   * { box-sizing: border-box; }
   a { color: #7A2874; text-decoration: none; }
   a:hover { color: #4FC7D9; }
+  #navLinks a { padding:6px 14px; border-radius:999px; transition:background 0.2s ease,color 0.2s ease; }
+  #navLinks a:hover { background:#F4C430; color:#2A1A2E; }
 </style>
 </head>
 <body>
@@ -296,8 +298,8 @@
   📝 Inscribirme
 </a>
 
-<button id="backToTop" onclick="animateScrollTo(0,700)" aria-label="Volver arriba" style="position:fixed;bottom:20px;left:20px;z-index:60;background:#2A1A2E;color:#fff;border:none;width:52px;height:52px;border-radius:999px;box-shadow:0 4px 14px rgba(0,0,0,0.25);display:flex;align-items:center;justify-content:center;cursor:pointer;font-size:20px;">
-  ↑
+<button id="backToTop" onclick="animateScrollTo(0,700)" aria-label="Volver arriba" style="position:fixed;bottom:20px;left:20px;z-index:60;background:#2A1A2E;color:#fff;border:none;width:52px;height:52px;border-radius:999px;box-shadow:0 4px 14px rgba(0,0,0,0.25);display:flex;align-items:center;justify-content:center;cursor:pointer;">
+  <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="19" x2="12" y2="5"/><polyline points="5 12 12 5 19 12"/></svg>
 </button>
 
 <script>
