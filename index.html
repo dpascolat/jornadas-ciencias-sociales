@@ -12,6 +12,11 @@
   body { margin: 0; background: #FFFCF7; overflow-x: hidden; }
   #inicio, #inscripcion, #destinatarios, #conferencistas, #cronograma, #certificacion, #comite, #ubicacion, #contacto { scroll-margin-top: 84px; }
   #navToggle { display: none; }
+  @media (max-width: 480px) {
+    #floatingInscribirme { padding:0 !important; width:52px; height:52px; justify-content:center; }
+    #floatingInscribirme .floatingLabel { display:none; }
+    #floatingInscribirme span:first-child { font-size:20px; }
+  }
   @media (max-width: 720px) {
     #navToggle { display: flex !important; }
     #navLinks { display: none !important; flex-basis: 100%; order: 10; flex-direction: column !important; gap: 14px !important; padding-top: 12px; margin-top: 8px; border-top: 1px solid #2A1A2E33; }
@@ -325,8 +330,8 @@
   </div>
 </div>
 
-<a href="#inscripcion" style="position:fixed;bottom:20px;right:20px;z-index:60;background:#F4C430;color:#2A1A2E;font-family:'Anton',sans-serif;letter-spacing:0.5px;text-transform:uppercase;font-size:15px;padding:14px 22px;border-radius:999px;box-shadow:0 4px 14px rgba(0,0,0,0.25);display:flex;align-items:center;gap:8px;">
-  📝 Inscribirme
+<a id="floatingInscribirme" href="#inscripcion" style="position:fixed;bottom:20px;right:20px;z-index:60;background:#F4C430;color:#2A1A2E;font-family:'Anton',sans-serif;letter-spacing:0.5px;text-transform:uppercase;font-size:15px;padding:14px 22px;border-radius:999px;box-shadow:0 4px 14px rgba(0,0,0,0.25);display:flex;align-items:center;gap:8px;">
+  <span>📝</span><span class="floatingLabel">Inscribirme</span>
 </a>
 
 <button id="backToTop" onclick="animateScrollTo(0,700)" aria-label="Volver arriba" style="position:fixed;bottom:20px;left:20px;z-index:60;background:#2A1A2E;color:#fff;border:none;width:52px;height:52px;border-radius:999px;box-shadow:0 4px 14px rgba(0,0,0,0.25);display:flex;align-items:center;justify-content:center;cursor:pointer;opacity:0;transform:scale(0.6) translateY(10px);pointer-events:none;transition:opacity 0.3s ease,transform 0.3s ease;">
