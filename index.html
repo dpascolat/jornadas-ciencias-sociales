@@ -36,6 +36,12 @@
 <body>
 <div style="font-family:'Work Sans',sans-serif;color:#2A1A2E;background:#FFFCF7;width:100%;">
 
+  <!-- ANUNCIO -->
+  <div id="announceBar" style="background:#F4C430;color:#2A1A2E;text-align:center;padding:10px 44px 10px 16px;font-size:14px;font-weight:800;position:relative;">
+    <a href="#inscripcion" style="color:#2A1A2E;">¡Ya están abiertas las inscripciones! Anotate acá →</a>
+    <button onclick="document.getElementById('announceBar').style.display='none';localStorage.setItem('announceBarClosed','1')" aria-label="Cerrar anuncio" style="position:absolute;top:50%;right:12px;transform:translateY(-50%);background:transparent;border:none;color:#2A1A2E;font-size:20px;line-height:1;cursor:pointer;padding:4px;">×</button>
+  </div>
+
   <!-- NAV -->
   <div id="navBar" style="position:sticky;top:0;z-index:50;background:#FFFCF7ee;backdrop-filter:blur(6px);border-bottom:3px solid #2A1A2E;display:flex;align-items:center;justify-content:space-between;padding:14px clamp(16px,4vw,48px);gap:16px;flex-wrap:wrap;">
     <a href="https://jornadas-ciencias-sociales.vercel.app/" style="display:flex;align-items:center;gap:10px;font-family:'Anton',sans-serif;letter-spacing:0.5px;">
@@ -382,6 +388,12 @@
       document.getElementById('navLinks').classList.remove('open');
     });
   });
+
+  try {
+    if (localStorage.getItem('announceBarClosed')) {
+      document.getElementById('announceBar').style.display = 'none';
+    }
+  } catch (e) {}
 
   const backToTopBtn = document.getElementById('backToTop');
   function updateBackToTop() {
