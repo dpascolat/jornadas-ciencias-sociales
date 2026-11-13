@@ -537,7 +537,7 @@
         if (r.archivos.length === 1) certDescargar(r.archivos[0].nombre, r.archivos[0].base64);
       } else if (r.paso === 'enviado') {
         el.fila.hidden = true; el.enviar.hidden = true; el.principal.textContent = 'Continuar'; paso = 'dni';
-        mensaje('Te enviamos el certificado a ' + r.correos.join(' y ') + '. Revisa también la carpeta de spam.', 'ok');
+        mensaje((r.motivo === 'correo_incorrecto' ? 'El correo que escribiste no coincide con el registrado, así que te enviamos el certificado a ' : 'Te enviamos el certificado a ') + r.correos.join(' y ') + '. Revisa también la carpeta de spam.', 'ok');
       }
     }
 
