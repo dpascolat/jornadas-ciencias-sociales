@@ -128,7 +128,7 @@
       <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(300px,1fr));gap:18px;">
         <div style="background:#fff;border-radius:14px;padding:clamp(18px,3vw,26px);">
           <div style="font-family:'Anton',sans-serif;font-size:22px;color:#7A2874;text-transform:uppercase;margin-bottom:8px;">Asistentes</div>
-          <p style="margin:0 0 14px;font-size:15px;line-height:1.5;color:#2A1A2E;">Para obtener tu certificado, primero responde la breve encuesta de las jornadas (es obligatoria). Luego ingresa tu DNI.</p>
+          <p style="margin:0 0 14px;font-size:15px;line-height:1.5;color:#2A1A2E;">Para obtener tu certificado, primero responde la breve encuesta de las jornadas (es obligatoria) con el mismo correo con el que te inscribiste. Luego ingresa tu DNI y te enviaremos el certificado a ese correo.</p>
           <p style="margin:0 0 16px;"><a id="certEncuesta" class="certBtn" href="#" target="_blank" rel="noopener" hidden>1. Responder la encuesta</a></p>
           <div class="certBox" data-cert-form="asistentes">
             <span style="display:inline-block;background:#BEEAF0;color:#155866;font-weight:800;font-size:13px;padding:10px 18px;border-radius:8px;">Disponible muy pronto</span>
@@ -136,7 +136,7 @@
         </div>
         <div style="background:#fff;border-radius:14px;padding:clamp(18px,3vw,26px);">
           <div style="font-family:'Anton',sans-serif;font-size:22px;color:#7A2874;text-transform:uppercase;margin-bottom:8px;">Colaboradores, organizadores y expositores</div>
-          <p style="margin:0 0 16px;font-size:15px;line-height:1.5;color:#2A1A2E;">Ingresa tu DNI para descargar tu certificado.</p>
+          <p style="margin:0 0 16px;font-size:15px;line-height:1.5;color:#2A1A2E;">Ingresa tu DNI. Si tenemos tu correo, te enviamos el certificado; si no, podrás descargarlo desde aquí.</p>
           <div class="certBox" data-cert-form="colaboradores">
             <span style="display:inline-block;background:#BEEAF0;color:#155866;font-weight:800;font-size:13px;padding:10px 18px;border-radius:8px;">Disponible muy pronto</span>
           </div>
@@ -480,54 +480,23 @@
       '<form novalidate>' +
         '<label>DNI (solo números)</label>' +
         '<input type="text" inputmode="numeric" autocomplete="off" maxlength="12" data-r="dni" placeholder="Ej.: 12345678">' +
-        '<div class="certRow" data-r="correoFila" hidden>' +
-          '<label data-r="correoEtiqueta"></label>' +
-          '<input type="email" autocomplete="email" data-r="correo" placeholder="tucorreo@ejemplo.com">' +
-        '</div>' +
-        '<div class="certRow">' +
-          '<button type="submit" class="certBtn" data-r="principal">Continuar</button> ' +
-          '<button type="button" class="certBtn certBtnAlt" data-r="enviar" hidden>No lo recuerdo: enviármelo por correo</button>' +
-        '</div>' +
+        '<div class="certRow"><button type="submit" class="certBtn" data-r="principal">Obtener mi certificado</button></div>' +
         '<p class="certMsg info" role="status" aria-live="polite" data-r="msg"></p>' +
         '<div class="certDl" data-r="descargas"></div>' +
       '</form>';
 
     const q = function (n) { return box.querySelector('[data-r="' + n + '"]'); };
-    const form = box.querySelector('form');
-    const el = { dni: q('dni'), correo: q('correo'), fila: q('correoFila'), etiqueta: q('correoEtiqueta'),
-                 principal: q('principal'), enviar: q('enviar'), msg: q('msg'), dl: q('descargas') };
-    let paso = 'dni';
+    const el = { dni: q('dni'), principal: q('principal'), msg: q('msg'), dl: q('descargas') };
 
     function mensaje(texto, tipo) { el.msg.textContent = texto || ''; el.msg.className = 'certMsg ' + (tipo || 'info'); }
-    function ocupado(si) { el.principal.disabled = si; el.enviar.disabled = si; }
-    function reiniciar() {
-      paso = 'dni'; el.fila.hidden = true; el.enviar.hidden = true; el.correo.value = '';
-      el.principal.textContent = 'Continuar'; el.dl.innerHTML = ''; mensaje('');
-    }
 
     function manejar(r) {
       el.dl.innerHTML = '';
-      if (!r || !r.ok) {
-        mensaje((r && r.error) || 'Hubo un problema. Intenta de nuevo en unos minutos.', 'err');
-        if (r && (r.codigo === 'dni_invalido' || r.codigo === 'no_hay')) { paso = 'dni'; el.fila.hidden = true; el.enviar.hidden = true; el.principal.textContent = 'Continuar'; }
-        return;
-      }
-      if (r.paso === 'correo') {
-        paso = 'correo';
-        el.etiqueta.textContent = 'Para proteger tus datos, escribe completo el correo registrado (' + r.correos.join(' o ') + ').';
-        el.fila.hidden = false; el.enviar.hidden = false; el.principal.textContent = 'Descargar certificado';
-        mensaje('');
-        el.correo.focus();
-      } else if (r.paso === 'correo_encuesta') {
-        paso = 'correo_encuesta';
-        el.etiqueta.textContent = 'Escribe el correo con el que respondiste la encuesta.';
-        el.fila.hidden = false; el.enviar.hidden = true; el.principal.textContent = 'Descargar certificado';
-        mensaje('');
-        el.correo.focus();
+      if (!r || !r.ok) { mensaje((r && r.error) || 'Hubo un problema. Intenta de nuevo en unos minutos.', 'err'); return; }
+      if (r.paso === 'enviado') {
+        mensaje('Te enviamos el certificado a ' + r.correos.join(' y ') + '. Revisa también la carpeta de spam.', 'ok');
       } else if (r.paso === 'descarga') {
-        el.fila.hidden = true; el.enviar.hidden = true; el.principal.textContent = 'Continuar'; paso = 'dni';
-        mensaje((r.archivos.length > 1 ? 'Listo. Estos son tus certificados:' : 'Listo. Si no se descargó solo, usa el botón.') +
-          (r.copiaA && r.copiaA.length ? ' También te enviamos una copia a ' + r.copiaA.join(' y ') + '.' : ''), 'ok');
+        mensaje(r.archivos.length > 1 ? 'Listo. Estos son tus certificados:' : 'Listo. Si no se descargó solo, usa el botón.', 'ok');
         r.archivos.forEach(function (a, i) {
           const b = document.createElement('button');
           b.type = 'button'; b.className = 'certBtn';
@@ -536,32 +505,18 @@
           el.dl.appendChild(b);
         });
         if (r.archivos.length === 1) certDescargar(r.archivos[0].nombre, r.archivos[0].base64);
-      } else if (r.paso === 'enviado') {
-        el.fila.hidden = true; el.enviar.hidden = true; el.principal.textContent = 'Continuar'; paso = 'dni';
-        mensaje((r.motivo === 'correo_incorrecto' ? 'El correo que escribiste no coincide con el registrado, así que te enviamos el certificado a ' : 'Te enviamos el certificado a ') + r.correos.join(' y ') + '. Revisa también la carpeta de spam.', 'ok');
       }
     }
 
-    function pedir(accion) {
+    box.querySelector('form').addEventListener('submit', function (ev) {
+      ev.preventDefault();
       const dni = el.dni.value.replace(/\D/g, '');
       if (dni.length < 6) { mensaje('Ingresa un DNI válido, solo números.', 'err'); el.dni.focus(); return; }
-      const datos = { accion: accion, dni: dni };
-      if (accion === 'descargar') {
-        datos.correo = el.correo.value.trim();
-        if (!datos.correo) { mensaje('Escribe el correo para continuar.', 'err'); el.correo.focus(); return; }
-      }
-      ocupado(true); mensaje('Buscando tu certificado…', 'info');
-      certLlamar(datos).then(manejar).catch(function () {
+      el.principal.disabled = true; el.dl.innerHTML = ''; mensaje('Buscando tu certificado…', 'info');
+      certLlamar({ dni: dni }).then(manejar).catch(function () {
         mensaje('No pudimos conectarnos. Revisa tu conexión e intenta de nuevo.', 'err');
-      }).then(function () { ocupado(false); });
-    }
-
-    form.addEventListener('submit', function (ev) {
-      ev.preventDefault();
-      pedir(paso === 'dni' ? 'consultar' : 'descargar');
+      }).then(function () { el.principal.disabled = false; });
     });
-    el.enviar.addEventListener('click', function () { pedir('enviar'); });
-    el.dni.addEventListener('input', function () { if (paso !== 'dni') reiniciar(); });
   }
 
   (function initCert() {
