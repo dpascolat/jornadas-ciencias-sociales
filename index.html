@@ -526,7 +526,8 @@
         el.correo.focus();
       } else if (r.paso === 'descarga') {
         el.fila.hidden = true; el.enviar.hidden = true; el.principal.textContent = 'Continuar'; paso = 'dni';
-        mensaje(r.archivos.length > 1 ? 'Listo. Estos son tus certificados:' : 'Listo. Si no se descargó solo, usa el botón.', 'ok');
+        mensaje((r.archivos.length > 1 ? 'Listo. Estos son tus certificados:' : 'Listo. Si no se descargó solo, usa el botón.') +
+          (r.copiaA && r.copiaA.length ? ' También te enviamos una copia a ' + r.copiaA.join(' y ') + '.' : ''), 'ok');
         r.archivos.forEach(function (a, i) {
           const b = document.createElement('button');
           b.type = 'button'; b.className = 'certBtn';
