@@ -103,6 +103,24 @@
   </div>
 
   <!-- CERTIFICADOS -->
+  <style>
+    .certBox{display:block;}
+    .certBox [hidden],#certEncuesta[hidden]{display:none !important;}
+    .certBox input{width:100%;box-sizing:border-box;padding:12px 14px;border:2px solid #cfc3d1;border-radius:8px;font-size:16px;font-family:inherit;color:#2A1A2E;background:#fff;}
+    .certBox input:focus{outline:3px solid #BEEAF0;border-color:#155866;}
+    .certBox label{display:block;font-size:14px;line-height:1.45;color:#2A1A2E;margin:0 0 8px;}
+    .certBtn{display:inline-block;padding:12px 20px;border:none;border-radius:8px;background:#7A2874;color:#fff;font-weight:800;font-size:14px;font-family:inherit;cursor:pointer;text-decoration:none;}
+    .certBtn:hover{background:#5d1f58;}
+    .certBtn:disabled{background:#cfc3d1;cursor:default;}
+    .certBtnAlt{background:#fff;color:#155866;border:2px solid #155866;}
+    .certBtnAlt:hover{background:#BEEAF0;}
+    .certMsg{margin:12px 0 0;font-size:14px;line-height:1.45;font-weight:700;}
+    .certMsg.err{color:#a3232a;}
+    .certMsg.ok{color:#155866;}
+    .certMsg.info{color:#2A1A2E;font-weight:600;}
+    .certRow{margin-top:12px;}
+    .certDl{display:flex;flex-wrap:wrap;gap:10px;margin-top:12px;}
+  </style>
   <div id="certificados" style="padding:clamp(32px,5vw,60px) clamp(16px,6vw,64px);background:#155866;">
     <div style="max-width:1180px;margin:0 auto;">
       <div style="font-family:'Anton',sans-serif;font-size:clamp(28px,4.4vw,46px);color:#F4C430;text-transform:uppercase;line-height:1.1;margin-bottom:10px;">¡Gracias por ser parte de las jornadas!</div>
@@ -110,19 +128,21 @@
       <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(300px,1fr));gap:18px;">
         <div style="background:#fff;border-radius:14px;padding:clamp(18px,3vw,26px);">
           <div style="font-family:'Anton',sans-serif;font-size:22px;color:#7A2874;text-transform:uppercase;margin-bottom:8px;">Asistentes</div>
-          <p style="margin:0 0 16px;font-size:15px;line-height:1.5;color:#2A1A2E;">Para recibir tu certificado, responde la breve encuesta de las jornadas. Al enviarla, el certificado llega al correo con el que te inscribiste.</p>
-          <span style="display:inline-block;background:#BEEAF0;color:#155866;font-weight:800;font-size:13px;padding:10px 18px;border-radius:8px;">Disponible muy pronto</span>
+          <p style="margin:0 0 14px;font-size:15px;line-height:1.5;color:#2A1A2E;">Para obtener tu certificado, primero responde la breve encuesta de las jornadas (es obligatoria). Luego ingresa tu DNI.</p>
+          <p style="margin:0 0 16px;"><a id="certEncuesta" class="certBtn" href="#" target="_blank" rel="noopener" hidden>1. Responder la encuesta</a></p>
+          <div class="certBox" data-cert-form="asistentes">
+            <span style="display:inline-block;background:#BEEAF0;color:#155866;font-weight:800;font-size:13px;padding:10px 18px;border-radius:8px;">Disponible muy pronto</span>
+          </div>
         </div>
         <div style="background:#fff;border-radius:14px;padding:clamp(18px,3vw,26px);">
           <div style="font-family:'Anton',sans-serif;font-size:22px;color:#7A2874;text-transform:uppercase;margin-bottom:8px;">Colaboradores, organizadores y expositores</div>
           <p style="margin:0 0 16px;font-size:15px;line-height:1.5;color:#2A1A2E;">Ingresa tu DNI para descargar tu certificado.</p>
-          <div style="display:flex;flex-wrap:wrap;gap:10px;">
-            <input type="text" inputmode="numeric" placeholder="DNI (solo números)" disabled style="flex:1;min-width:160px;padding:12px 14px;border:2px solid #cfc3d1;border-radius:8px;font-size:15px;background:#f4eff5;">
-            <button disabled style="padding:12px 20px;border:none;border-radius:8px;background:#cfc3d1;color:#fff;font-weight:800;font-size:14px;">Descargar</button>
+          <div class="certBox" data-cert-form="colaboradores">
+            <span style="display:inline-block;background:#BEEAF0;color:#155866;font-weight:800;font-size:13px;padding:10px 18px;border-radius:8px;">Disponible muy pronto</span>
           </div>
-          <p style="margin:10px 0 0;font-size:13px;font-weight:700;color:#155866;">Disponible muy pronto</p>
         </div>
       </div>
+      <p style="color:#d9eef2;font-size:13px;line-height:1.5;max-width:820px;margin:18px 0 0;">¿Algún dato de tu certificado está mal o no lo encuentras? Escríbenos a <a href="mailto:jornadassociales@ifdcsao.edu.ar" style="color:#F4C430;">jornadassociales@ifdcsao.edu.ar</a>.</p>
     </div>
   </div>
 
@@ -431,6 +451,124 @@
   }
   window.addEventListener('scroll', updateBackToTop, { passive: true });
   updateBackToTop();
+
+  // ---- Certificados ----
+  // Mientras CERT.api esté vacío la sección muestra "Disponible muy pronto".
+  const CERT = {
+    api: '',
+    encuesta: 'https://docs.google.com/forms/d/e/1FAIpQLSekK7e1jBeA8jtb-gG3Fs0lgVFjU9G1OQqJ3smdSZae3uQvJA/viewform'
+  };
+
+  function certDescargar(nombre, base64) {
+    const bin = atob(base64);
+    const bytes = new Uint8Array(bin.length);
+    for (let i = 0; i < bin.length; i++) bytes[i] = bin.charCodeAt(i);
+    const url = URL.createObjectURL(new Blob([bytes], { type: 'application/pdf' }));
+    const a = document.createElement('a');
+    a.href = url; a.download = nombre;
+    document.body.appendChild(a); a.click(); a.remove();
+    setTimeout(function () { URL.revokeObjectURL(url); }, 60000);
+  }
+
+  function certLlamar(datos) {
+    // POST como text/plain: no genera preflight y el DNI/correo no viajan en la URL.
+    return fetch(CERT.api, { method: 'POST', body: JSON.stringify(datos) }).then(function (r) { return r.json(); });
+  }
+
+  function certIniciar(box) {
+    box.innerHTML =
+      '<form novalidate>' +
+        '<label>DNI (solo números)</label>' +
+        '<input type="text" inputmode="numeric" autocomplete="off" maxlength="12" data-r="dni" placeholder="Ej.: 12345678">' +
+        '<div class="certRow" data-r="correoFila" hidden>' +
+          '<label data-r="correoEtiqueta"></label>' +
+          '<input type="email" autocomplete="email" data-r="correo" placeholder="tucorreo@ejemplo.com">' +
+        '</div>' +
+        '<div class="certRow">' +
+          '<button type="submit" class="certBtn" data-r="principal">Continuar</button> ' +
+          '<button type="button" class="certBtn certBtnAlt" data-r="enviar" hidden>No lo recuerdo: enviármelo por correo</button>' +
+        '</div>' +
+        '<p class="certMsg info" role="status" aria-live="polite" data-r="msg"></p>' +
+        '<div class="certDl" data-r="descargas"></div>' +
+      '</form>';
+
+    const q = function (n) { return box.querySelector('[data-r="' + n + '"]'); };
+    const form = box.querySelector('form');
+    const el = { dni: q('dni'), correo: q('correo'), fila: q('correoFila'), etiqueta: q('correoEtiqueta'),
+                 principal: q('principal'), enviar: q('enviar'), msg: q('msg'), dl: q('descargas') };
+    let paso = 'dni';
+
+    function mensaje(texto, tipo) { el.msg.textContent = texto || ''; el.msg.className = 'certMsg ' + (tipo || 'info'); }
+    function ocupado(si) { el.principal.disabled = si; el.enviar.disabled = si; }
+    function reiniciar() {
+      paso = 'dni'; el.fila.hidden = true; el.enviar.hidden = true; el.correo.value = '';
+      el.principal.textContent = 'Continuar'; el.dl.innerHTML = ''; mensaje('');
+    }
+
+    function manejar(r) {
+      el.dl.innerHTML = '';
+      if (!r || !r.ok) {
+        mensaje((r && r.error) || 'Hubo un problema. Intenta de nuevo en unos minutos.', 'err');
+        if (r && (r.codigo === 'dni_invalido' || r.codigo === 'no_hay')) { paso = 'dni'; el.fila.hidden = true; el.enviar.hidden = true; el.principal.textContent = 'Continuar'; }
+        return;
+      }
+      if (r.paso === 'correo') {
+        paso = 'correo';
+        el.etiqueta.textContent = 'Para proteger tus datos, escribe completo el correo registrado (' + r.correos.join(' o ') + ').';
+        el.fila.hidden = false; el.enviar.hidden = false; el.principal.textContent = 'Descargar certificado';
+        mensaje('');
+        el.correo.focus();
+      } else if (r.paso === 'correo_encuesta') {
+        paso = 'correo_encuesta';
+        el.etiqueta.textContent = 'Escribe el correo con el que respondiste la encuesta.';
+        el.fila.hidden = false; el.enviar.hidden = true; el.principal.textContent = 'Descargar certificado';
+        mensaje('');
+        el.correo.focus();
+      } else if (r.paso === 'descarga') {
+        el.fila.hidden = true; el.enviar.hidden = true; el.principal.textContent = 'Continuar'; paso = 'dni';
+        mensaje(r.archivos.length > 1 ? 'Listo. Estos son tus certificados:' : 'Listo. Si no se descargó solo, usa el botón.', 'ok');
+        r.archivos.forEach(function (a, i) {
+          const b = document.createElement('button');
+          b.type = 'button'; b.className = 'certBtn';
+          b.textContent = r.archivos.length > 1 ? 'Descargar certificado ' + (i + 1) : 'Descargar certificado';
+          b.addEventListener('click', function () { certDescargar(a.nombre, a.base64); });
+          el.dl.appendChild(b);
+        });
+        if (r.archivos.length === 1) certDescargar(r.archivos[0].nombre, r.archivos[0].base64);
+      } else if (r.paso === 'enviado') {
+        el.fila.hidden = true; el.enviar.hidden = true; el.principal.textContent = 'Continuar'; paso = 'dni';
+        mensaje('Te enviamos el certificado a ' + r.correos.join(' y ') + '. Revisa también la carpeta de spam.', 'ok');
+      }
+    }
+
+    function pedir(accion) {
+      const dni = el.dni.value.replace(/\D/g, '');
+      if (dni.length < 6) { mensaje('Ingresa un DNI válido, solo números.', 'err'); el.dni.focus(); return; }
+      const datos = { accion: accion, dni: dni };
+      if (accion === 'descargar') {
+        datos.correo = el.correo.value.trim();
+        if (!datos.correo) { mensaje('Escribe el correo para continuar.', 'err'); el.correo.focus(); return; }
+      }
+      ocupado(true); mensaje('Buscando tu certificado…', 'info');
+      certLlamar(datos).then(manejar).catch(function () {
+        mensaje('No pudimos conectarnos. Revisa tu conexión e intenta de nuevo.', 'err');
+      }).then(function () { ocupado(false); });
+    }
+
+    form.addEventListener('submit', function (ev) {
+      ev.preventDefault();
+      pedir(paso === 'dni' ? 'consultar' : 'descargar');
+    });
+    el.enviar.addEventListener('click', function () { pedir('enviar'); });
+    el.dni.addEventListener('input', function () { if (paso !== 'dni') reiniciar(); });
+  }
+
+  (function initCert() {
+    if (!CERT.api) return;
+    const link = document.getElementById('certEncuesta');
+    if (link) { link.href = CERT.encuesta; link.hidden = false; }
+    document.querySelectorAll('[data-cert-form]').forEach(certIniciar);
+  })();
 </script>
 </body>
 </html>
